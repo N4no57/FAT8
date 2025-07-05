@@ -1,6 +1,8 @@
-from src.utils import TOTAL_CLUSTERS
+from src.utils import TOTAL_CLUSTERS, DATA_SECTOR_START
 
 FAT = [0 for _ in range(TOTAL_CLUSTERS)]
+for i in range(DATA_SECTOR_START):
+    FAT[i] = 0xFF
 
 def allocate_cluster_chain(count: int) -> list:
     """Allocate a chain of `count` clusters and return their indices in order."""
