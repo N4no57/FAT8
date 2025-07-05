@@ -1,3 +1,6 @@
+from random import randint
+from urllib.parse import to_bytes
+
 BOOT_SECTOR = 0
 SECTOR_SIZE = 512
 TOTAL_SECTORS = 256
@@ -18,3 +21,12 @@ DATA_SECTOR_START = 6
 FAT = [0 for _ in range(TOTAL_CLUSTERS)]
 
 DIRECTORY_ENTRY_SIZE = 32
+
+def generate_img_file():
+    with open("disk.img", "wb+") as f:
+        for i in range(TOTAL_SECTORS * SECTOR_SIZE):
+            f.write(randint(0, 255).to_bytes(1, byteorder='little'))
+
+        f.seek(0)
+        for i in range(ROOT_DIRECTORY_SECTOR_END * SECTOR_SIZE):
+            f.write(int(0).to_bytes(1, byteorder='little'))
