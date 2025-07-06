@@ -35,6 +35,9 @@ def get_full_path(FAT: list[int], start_cluster: int) -> str:
     parts = []
     current_cluster = start_cluster
 
+    if start_cluster == ROOT_DIRECTORY_SECTOR_START:
+        return "/"
+
     while True:
         dotdot_entry = find_entry(FAT, "..", current_cluster)
         parent_cluster = dotdot_entry.first_cluster
