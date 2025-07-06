@@ -2,7 +2,7 @@ from src.disk import write_sector, read_sector
 from src.utils import SECTOR_SIZE, FAT_SECTOR, TOTAL_CLUSTERS
 
 
-def allocate_cluster_chain(FAT: list[int], count: int) -> list:
+def allocate_cluster_chain(FAT: list[int], count: int) -> list | None:
     """Allocate a chain of `count` clusters and return their indices in order."""
     cluster_chain = []
     fat_index = 0
@@ -20,6 +20,8 @@ def allocate_cluster_chain(FAT: list[int], count: int) -> list:
 
     FAT[cluster_chain[-1]] = 0xFF  # EOF
 
+    save_FAT(FAT)
+
     return cluster_chain
 
 def free_cluster_chain(FAT: list[int], start_cluster: int) -> None:
@@ -31,6 +33,8 @@ def free_cluster_chain(FAT: list[int], start_cluster: int) -> None:
         if next_cluster == 0xFF:
             break
         current = next_cluster
+
+    save_FAT(FAT)
 
 def get_cluster_chain(FAT: list[int], start_cluster: int) -> list[int]:
     """Return all clusters in the chain starting at `start_cluster`."""
