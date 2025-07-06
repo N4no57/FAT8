@@ -43,7 +43,6 @@ def get_cluster_chain(FAT: list[int], start_cluster: int) -> list[int]:
     while current != 0xFF and current < len(FAT):
         cluster_chain.append(current)
         current = FAT[current]
-    cluster_chain.append(current)  # include final 0xFF
     return cluster_chain
 
 def save_FAT(FAT: list[int]) -> None:
