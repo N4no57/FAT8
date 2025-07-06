@@ -102,6 +102,41 @@ def create_entry(FAT: list[int], name: str,
                  parent_cluster: int = 2, size: int = 0) -> DirectoryEntry:
     """Adds a file or subdirectory entry to a directory.
     Allocates a cluster and returns the new entry"""
+    data = []
+    if len(name) > 8:
+        print("file name too long")
+    for i in range(8):
+        if i > len(name)-1:
+            data.append(0x20)
+            continue
+        data.append(ord(name[i]))
+    if len(extension) > 3:
+        print("extension too long")
+    for i in range(3):
+        if i > len(extension) - 1:
+            data.append(0x20)
+            continue
+        data.append(ord(extension[i]))
+    if is_dir:
+        data.append(0x10)
+    else:
+        data.append(0)
+    for i in range(14):
+        data.append(0)
+    cluster_chain = allocate_cluster_chain(FAT, 1 if is_dir else size)
+    data.append(cluster_chain[0] & 0xFF)
+    data.append((cluster_chain[0] >> 8) & 0xFF)
+    data.append(size & 0xFF)
+    data.append((size >> 8) & 0xFF)
+    data.append((size >> 16) & 0xFF)
+    data.append((size >> 24) & 0xFF)
+
+    parent_entries = read_directory(FAT, parent_cluster)
+    parent_entries.append(DirectoryEntry(data))
+
+    write_directory(FAT, parent_cluster, parent_entries)
+
+    return DirectoryEntry(data)
 
 def delete_entry(name: str, cluster: int):
     """Marks a directory entry as deleted (e.g., by zeroing the first byte)
