@@ -56,7 +56,7 @@ class DirectoryEntry:
             return f"<DirectoryEntry '{self.filename}' cluster={self.first_cluster}>"
 
 def read_directory(FAT: list[int], cluster: int) -> list[DirectoryEntry]:
-    """Reads a directory starting at a given cluster. following FAT chains if the directory spans multiple clusters
+    """Reads a directory starting at a given cluster. following FAT chains if the directory spans multiple clusters.
     Returns a list of DirectoryEntry objects"""
     directory_entries = []
 
@@ -79,13 +79,11 @@ def write_directory(FAT: list[int], cluster: int, entries: list[DirectoryEntry])
             return
 
     raw_data = b''.join(entry.pack() for entry in entries)
-
     clusters_needed = math.ceil(len(entries) / TOTAL_CLUSTERS)
-
     clusters = get_cluster_chain(FAT, cluster)
 
     if len(clusters) < clusters_needed: # TODO extend cluster chain if not root directory
-        print("no more clusters directory, sucks yo be you")
+        print("no more clusters directory, sucks to be you")
         return
 
     i = 0
@@ -94,6 +92,10 @@ def write_directory(FAT: list[int], cluster: int, entries: list[DirectoryEntry])
 
 def find_entry(FAT: list[int], name: str, cluster: int) -> DirectoryEntry | None:
     """Searches for an entry in the directory (useful for path resolution)"""
+    directory_entries = read_directory(FAT, cluster)
+    for entry in directory_entries:
+        if entry.filename.strip() == name:
+            return entry
 
 def create_entry(FAT: list[int], name: str, is_dir: bool, parent_cluster: int) -> DirectoryEntry:
     """Adds a file or subdirectory entry to a directory
