@@ -8,6 +8,9 @@ def allocate_cluster_chain(FAT: list, count: int) -> list:
             count -= 1
         fat_index += 1
 
+    if count > 0:
+        return None # Not enough memory
+
     for i in range(len(cluster_chain) - 1):
         FAT[cluster_chain[i]] = cluster_chain[i + 1]
 
