@@ -36,6 +36,12 @@ def find_entry(FAT: list[int], name: str, cluster: int) -> DirectoryEntry | None
         if entry.filename.strip() == name:
             return entry
 
+def find_entry_by_cluster(FAT: list[int], target_cluster: int, start_cluster: int) -> DirectoryEntry | None:
+    directory_entries = read_directory(FAT, start_cluster)
+    for entry in directory_entries:
+        if entry.first_cluster == target_cluster:
+            return entry
+
 def create_entry(FAT: list[int], name: str,
                  extension: str = "", is_dir: bool = False,
                  parent_cluster: int = 2, size: int = 0) -> DirectoryEntry:
