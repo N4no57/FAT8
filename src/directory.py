@@ -101,6 +101,10 @@ def list_directory(FAT: list[int], cluster: int) -> list[str]:
     """Lists filenames in a directory. Could filter out deleted entries, special system files, etc."""
     directory_entries = read_directory(FAT, cluster)
     for entry in directory_entries:
+        if entry.filename == ".":
+            continue
+        elif entry.filename == "..":
+            continue
         print(entry.filename)
 
 def create_directory(FAT: list[int], name: str, parent_cluster: int):
