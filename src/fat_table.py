@@ -1,4 +1,8 @@
-def allocate_cluster_chain(FAT: list, count: int) -> list:
+from src.disk import write_sector
+from src.utils import SECTOR_SIZE, FAT_SECTOR
+
+
+def allocate_cluster_chain(FAT: list[int], count: int) -> list:
     """Allocate a chain of `count` clusters and return their indices in order."""
     cluster_chain = []
     fat_index = 0
@@ -18,7 +22,7 @@ def allocate_cluster_chain(FAT: list, count: int) -> list:
 
     return cluster_chain
 
-def free_cluster_chain(FAT: list, start_cluster: int) -> None:
+def free_cluster_chain(FAT: list[int], start_cluster: int) -> None:
     """Free all clusters in the chain starting at `start_cluster`."""
     current = start_cluster
     while current != 0xFF and current < len(FAT):
@@ -28,7 +32,7 @@ def free_cluster_chain(FAT: list, start_cluster: int) -> None:
             break
         current = next_cluster
 
-def get_cluster_chain(FAT: list, start_cluster: int) -> list[int]:
+def get_cluster_chain(FAT: list[int], start_cluster: int) -> list[int]:
     """Return all clusters in the chain starting at `start_cluster`."""
     cluster_chain = []
     current = start_cluster
@@ -38,8 +42,26 @@ def get_cluster_chain(FAT: list, start_cluster: int) -> list[int]:
     cluster_chain.append(current)  # include final 0xFF
     return cluster_chain
 
-def is_free(FAT: list, cluster: int) -> bool:
+def save_FAT(FAT: list[int]) -> None:
+    sector_data = b''
+
+    for i in range(len(FAT)):
+        sector_data += FAT[i].to_bytes(1, 'little')
+
+    for i in range(SECTOR_SIZE - len(FAT)):
+        sector_data += b'\00'
+
+
+
+    write_sector(FAT_SECTOR, sector_data)
+
+def load_FAT(FAT: list[int]) -> list[int]:
+    sector_data = []
+
+    return sector_data
+
+def is_free(FAT: list[int], cluster: int) -> bool:
     return FAT[cluster] == 0
 
-def is_eof(FAT: list, cluster: int) -> bool:
+def is_eof(FAT: list[int], cluster: int) -> bool:
     return FAT[cluster] == 0xFF
