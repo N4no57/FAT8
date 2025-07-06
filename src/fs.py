@@ -1,4 +1,6 @@
 from src.utils import DIRECTORY_ENTRY_SIZE
+from src.fat_table import get_cluster_chain
+from src.disk import read_sector
 
 class DirectoryEntry:
     def __init__(self, data=None):
