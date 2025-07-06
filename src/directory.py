@@ -1,7 +1,7 @@
 import math
 
 from src.disk import read_sector, write_sector
-from src.fat_table import allocate_cluster_chain, get_cluster_chain
+from src.fat_table import allocate_cluster_chain, get_cluster_chain, free_cluster_chain
 from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START, SECTOR_SIZE, ROOT_DIRECTORY_SECTOR_START
 
 
@@ -143,9 +143,19 @@ def create_entry(FAT: list[int], name: str,
 
     return DirectoryEntry(data)
 
-def delete_entry(name: str, cluster: int):
-    """Marks a directory entry as deleted (e.g., by zeroing the first byte)
+def delete_entry(FAT: list[int], name: str, cluster: int):
+    """Marks a directory entry as deleted by zeroing out the entry
     Handles cleanup if needed (e.g., freeing clusters)"""
+    directory_entries = read_directory(FAT, cluster)
+    located_entry = DirectoryEntry([0 for _ in range(DIRECTORY_ENTRY_SIZE)])
+    for entry in directory_entries:
+        if entry.filename.strip() == name:
+            located_entry = entry
+            break
+    free_cluster_chain(FAT, located_entry.first_cluster)
+    located_entry.data = [0 for _ in range(DIRECTORY_ENTRY_SIZE)]
+
+    write_directory(FAT, cluster, directory_entries)
 
 def list_directory(FAT: list[int], cluster: int) -> list[str]:
     """Lists filenames in a directory. Could filter out deleted entries, special system files, etc."""
