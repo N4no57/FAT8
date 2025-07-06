@@ -30,8 +30,5 @@ def resolve(FAT: list[int], path: str, cwd_cluster: int = ROOT_DIRECTORY_SECTOR_
 
     return match
 
-def split_path(path: str) -> (str, str):
-    """Split '/foo/bar/baz.txt' into ('/foo/bar', 'baz.txt')"""
-
 def is_absolute(path: str) -> bool:
     return path.startswith('/')
