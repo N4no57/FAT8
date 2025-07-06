@@ -1,5 +1,5 @@
-from src.disk import write_sector
-from src.utils import SECTOR_SIZE, FAT_SECTOR
+from src.disk import write_sector, read_sector
+from src.utils import SECTOR_SIZE, FAT_SECTOR, TOTAL_CLUSTERS
 
 
 def allocate_cluster_chain(FAT: list[int], count: int) -> list:
@@ -51,12 +51,15 @@ def save_FAT(FAT: list[int]) -> None:
     for i in range(SECTOR_SIZE - len(FAT)):
         sector_data += b'\00'
 
-
-
     write_sector(FAT_SECTOR, sector_data)
 
-def load_FAT(FAT: list[int]) -> list[int]:
+def load_FAT() -> list[int]:
     sector_data = []
+
+    sector_bytes = read_sector(FAT_SECTOR)
+
+    for i in range(TOTAL_CLUSTERS):
+        sector_data.append(int(sector_bytes[i]))
 
     return sector_data
 
