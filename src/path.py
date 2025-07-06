@@ -1,3 +1,4 @@
+from src.directory import find_entry, find_entry_by_cluster
 from src.fs import DirectoryEntry, read_directory
 from src.utils import ROOT_DIRECTORY_SECTOR_START
 
@@ -29,6 +30,25 @@ def resolve(FAT: list[int], path: str, cwd_cluster: int = ROOT_DIRECTORY_SECTOR_
             return match
 
     return match
+
+def get_full_path(FAT: list[int], start_cluster: int) -> str:
+    parts = []
+    current_cluster = start_cluster
+
+    while True:
+        dotdot_entry = find_entry(FAT, "..", current_cluster)
+        parent_cluster = dotdot_entry.first_cluster
+
+        name_entry = find_entry_by_cluster(FAT, current_cluster, parent_cluster)
+        parts.append(name_entry.filename)
+
+        current_cluster = parent_cluster
+
+        if parent_cluster == ROOT_DIRECTORY_SECTOR_START:
+            break
+
+    parts.reverse()
+    return "/" + "/".join(parts)
 
 def is_absolute(path: str) -> bool:
     return path.startswith('/')
