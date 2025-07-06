@@ -176,7 +176,7 @@ def create_dot_entry(cluster):
     entry[11] = 0x10 # directory attribute
     entry[26] = cluster & 0xFF
     entry[27] = (cluster >> 8) & 0xFF
-    return entry
+    return DirectoryEntry(entry)
 
 def create_dotdot_entry(parent_cluster):
     entry = [0] * 32
