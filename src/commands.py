@@ -1,4 +1,4 @@
-from src.directory import list_directory, create_directory
+from src.directory import list_directory, create_directory, delete_directory
 from src.path import resolve, get_full_path
 
 def cmd_help():
@@ -16,3 +16,20 @@ def cmd_ls(FAT: list[int], cwd_cluster: int) -> None:
 
 def cmd_mkdir(FAT: list[int], name: str, cwd_cluster: int) -> None:
     create_directory(FAT, name, cwd_cluster)
+
+def cmd_rm(FAT:list[int], args: list[str], cwd_cluster: int) -> None:
+    mode = ""
+    file = ""
+
+    i = 0
+    while i < len(args):
+        if args[i].startswith("-"):
+            mode += args[i][1:]
+            i+=1
+            continue
+
+        file = args[i]
+        break
+
+    if 'd' in mode:
+        delete_directory(FAT, file, cwd_cluster)
