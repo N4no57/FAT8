@@ -1,6 +1,8 @@
-from src.disk import read_sector
+import math
+
+from src.disk import read_sector, write_sector
 from src.fat_table import allocate_cluster_chain, get_cluster_chain
-from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START, SECTOR_SIZE
+from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START, SECTOR_SIZE, ROOT_DIRECTORY_SECTOR_START
 
 
 class DirectoryEntry:
@@ -36,6 +38,17 @@ class DirectoryEntry:
         # bytes 28-31: little endian file size (4 bytes)
         return self.data[28] + (self.data[29] << 8) + (self.data[30] << 16) + (self.data[31] << 24)
 
+    def pack(self):
+        byte_data = b''
+        for i in range(DIRECTORY_ENTRY_SIZE):
+            byte_data += self.data[i].to_bytes(1, 'little')
+        return byte_data
+
+    def unpack(self, data: bytes):
+        if len(data) != DIRECTORY_ENTRY_SIZE:
+            raise ValueError("invalid entry size\nEntry data must be 32 byte long")
+        self.data = int.from_bytes(data, 'little')
+
     def __repr__(self):
         if self.attributes != 0x10:
             return f"<DirectoryEntry '{self.filename}.{self.extension}' size={self.file_size} cluster={self.first_cluster}>"
@@ -60,6 +73,24 @@ def read_directory(FAT: list[int], cluster: int) -> list[DirectoryEntry]:
 def write_directory(FAT: list[int], cluster: int, entries: list[DirectoryEntry]) -> None:
     """Writes a list of DirectoryEntrys into the specified directory cluster(s).
     May require allocating new clusters if the list grows."""
+    if cluster == ROOT_DIRECTORY_SECTOR_START:
+        if len(entries) > 80:
+            print("no more room in root directory")
+            return
+
+    raw_data = b''.join(entry.pack() for entry in entries)
+
+    clusters_needed = math.ceil(len(entries) / TOTAL_CLUSTERS)
+
+    clusters = get_cluster_chain(FAT, cluster)
+
+    if len(clusters) < clusters_needed: # TODO extend cluster chain if not root directory
+        print("no more clusters directory, sucks yo be you")
+        return
+
+    i = 0
+    for cluster in clusters:
+        write_sector(cluster, raw_data[i * SECTOR_SIZE:(i + 1) * SECTOR_SIZE])
 
 def find_entry(FAT: list[int], name: str, cluster: int) -> DirectoryEntry | None:
     """Searches for an entry in the directory (useful for path resolution)"""
