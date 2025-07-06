@@ -1,4 +1,4 @@
-from src.directory import list_directory
+from src.directory import list_directory, create_directory
 from src.path import resolve, get_full_path
 
 def cmd_help():
@@ -13,3 +13,6 @@ def cmd_cd(FAT: list[int], directory: str, cwd_cluster: int) -> (str, int):
 
 def cmd_ls(FAT: list[int], cwd_cluster: int) -> None:
     list_directory(FAT, cwd_cluster)
+
+def cmd_mkdir(FAT: list[int], name: str, cwd_cluster: int) -> None:
+    create_directory(FAT, name, cwd_cluster)
