@@ -1,5 +1,7 @@
 import math
 
+from setuptools.command.egg_info import write_entries
+
 from src.disk import read_sector, write_sector
 from src.fat_table import allocate_cluster_chain, get_cluster_chain, free_cluster_chain
 from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START, SECTOR_SIZE, ROOT_DIRECTORY_SECTOR_START
@@ -162,6 +164,15 @@ def list_directory(FAT: list[int], cluster: int) -> list[str]:
     directory_entries = read_directory(FAT, cluster)
     for entry in directory_entries:
         print(entry.filename)
+
+def create_directory(FAT: list[int], name: str, parent_cluster: int):
+    directoryEntry = create_entry(FAT, name, is_dir=True, parent_cluster=parent_cluster)
+    SWD = directoryEntry.first_cluster # the subdirectories Current Working Directory
+
+    dot_entry = create_dot_entry(SWD)
+    dotdot_entry = create_dotdot_entry(parent_cluster)
+    subdirEntryTable = [dot_entry, dotdot_entry]
+    write_directory(FAT, SWD, subdirEntryTable)
 
 ##################################################
 ### HELPER FUNCTIONS
