@@ -18,14 +18,15 @@ def allocate_cluster_chain(FAT: list, count: int) -> list:
 
     return cluster_chain
 
-def free_cluster_chain(FAT: list,start_cluster: int) -> None:
+def free_cluster_chain(FAT: list, start_cluster: int) -> None:
     """Free all clusters in the chain starting at `start_cluster`."""
-    fat_index = start_cluster
-    while FAT[fat_index] != 0xFF:
-        FAT[fat_index] = 0
-        fat_index+=1
-
-    FAT[fat_index] = 0
+    current = start_cluster
+    while current != 0xFF and current < len(FAT):
+        next_cluster = FAT[current]
+        FAT[current] = 0
+        if next_cluster == 0xFF:
+            break
+        current = next_cluster
 
 def get_cluster_chain(FAT: list, start_cluster: int) -> list[int]:
     """Return all clusters in the chain starting at `start_cluster`."""
