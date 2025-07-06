@@ -58,15 +58,15 @@ class DirectoryEntry:
 def read_directory(FAT: list[int], cluster: int) -> list[DirectoryEntry]:
     """Reads a directory starting at a given cluster. following FAT chains if the directory spans multiple clusters
     Returns a list of DirectoryEntry objects"""
-    cluster_chain = get_cluster_chain(FAT, cluster)
-    directory_bytes = b''
     directory_entries = []
 
-    for cluster in cluster_chain:
-        directory_bytes += read_sector(cluster)
-
-    for i in range(len(directory_bytes) // 32):
-        directory_entries.append(DirectoryEntry(directory_bytes[i * 32: (i + 1) * 32]))
+    for cluster in get_cluster_chain(FAT, cluster):
+        data = read_sector(cluster)
+        for i in range(0, len(data), DIRECTORY_ENTRY_SIZE):
+            entry_data = data[i:i + DIRECTORY_ENTRY_SIZE]
+            if all(b == 0x00 for b in entry_data):
+                continue  # skip empty slots
+            directory_entries.append(DirectoryEntry(entry_data))
 
     return directory_entries
 
