@@ -174,6 +174,9 @@ def create_directory(FAT: list[int], name: str, parent_cluster: int):
     subdirEntryTable = [dot_entry, dotdot_entry]
     write_directory(FAT, SWD, subdirEntryTable)
 
+def delete_directory(FAT: list[int], name: str, cwd: int):
+    delete_entry(FAT, name, cluster)
+
 ##################################################
 ### HELPER FUNCTIONS
 ###################################################
