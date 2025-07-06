@@ -82,6 +82,10 @@ def write_directory(FAT: list[int], cluster: int, entries: list[DirectoryEntry])
     clusters_needed = math.ceil(len(entries) / TOTAL_CLUSTERS)
     clusters = get_cluster_chain(FAT, cluster)
 
+    if len(raw_data) < clusters[len(clusters)-1] * SECTOR_SIZE: # pad raw_data with 0x00
+        for i in range(len(raw_data), clusters[len(clusters)-1] * SECTOR_SIZE):
+            raw_data += b'\x00'
+
     if len(clusters) < clusters_needed: # TODO extend cluster chain if not root directory
         print("no more clusters directory, sucks to be you")
         return
@@ -89,6 +93,7 @@ def write_directory(FAT: list[int], cluster: int, entries: list[DirectoryEntry])
     i = 0
     for cluster in clusters:
         write_sector(cluster, raw_data[i * SECTOR_SIZE:(i + 1) * SECTOR_SIZE])
+        i += 1
 
 def find_entry(FAT: list[int], name: str, cluster: int) -> DirectoryEntry | None:
     """Searches for an entry in the directory (useful for path resolution)"""
