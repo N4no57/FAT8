@@ -2,21 +2,16 @@ def allocate_cluster_chain(FAT: list, count: int) -> list:
     """Allocate a chain of `count` clusters and return their indices in order."""
     cluster_chain = []
     fat_index = 0
-    while count > 0:
-        if FAT[fat_index] != 0x00:
-            fat_index+=1
-            continue
+    while count > 0 and fat_index < len(FAT):
+        if FAT[fat_index] == 0x00:
+            cluster_chain.append(fat_index)
+            count -= 1
+        fat_index += 1
 
-        cluster_chain.append(fat_index)
-        fat_index+=1
-        count-=1
+    for i in range(len(cluster_chain) - 1):
+        FAT[cluster_chain[i]] = cluster_chain[i + 1]
 
-    for i in range(len(cluster_chain)):
-        if i == (len(cluster_chain)-1):
-            FAT[cluster_chain[i]] = 0xFF
-            break
-
-        FAT[cluster_chain[i]] = cluster_chain[i+1]
+    FAT[cluster_chain[-1]] = 0xFF  # EOF
 
     return cluster_chain
 
