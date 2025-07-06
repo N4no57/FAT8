@@ -1,4 +1,5 @@
-from src.utils import DIRECTORY_ENTRY_SIZE
+from src.fat_table import allocate_cluster_chain
+from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START
 
 
 class DirectoryEntry:
@@ -39,6 +40,11 @@ class DirectoryEntry:
             return f"<DirectoryEntry '{self.filename}.{self.extension}' size={self.file_size} cluster={self.first_cluster}>"
         else:
             return f"<DirectoryEntry '{self.filename}' cluster={self.first_cluster}>"
+
+def make_directory(FAT: list, parent_cluster: int) -> None:
+    """"""
+    cluster_chain = allocate_cluster_chain(FAT, 1)
+    start_cluster = cluster_chain[0]
 
 ##################################################
 ### HELPER FUNCTIONS
