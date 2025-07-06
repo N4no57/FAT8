@@ -1,5 +1,6 @@
-from src.fat_table import allocate_cluster_chain
-from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START
+from src.disk import read_sector
+from src.fat_table import allocate_cluster_chain, get_cluster_chain
+from src.utils import DIRECTORY_ENTRY_SIZE, TOTAL_CLUSTERS, DATA_SECTOR_START, SECTOR_SIZE
 
 
 class DirectoryEntry:
@@ -41,10 +42,39 @@ class DirectoryEntry:
         else:
             return f"<DirectoryEntry '{self.filename}' cluster={self.first_cluster}>"
 
-def make_directory(FAT: list, parent_cluster: int) -> None:
-    """"""
-    cluster_chain = allocate_cluster_chain(FAT, 1)
-    start_cluster = cluster_chain[0]
+def read_directory(FAT: list[int], cluster: int) -> list[DirectoryEntry]:
+    """Reads a directory starting at a given cluster. following FAT chains if the directory spans multiple clusters
+    Returns a list of DirectoryEntry objects"""
+    cluster_chain = get_cluster_chain(FAT, cluster)
+    directory_bytes = b''
+    directory_entries = []
+
+    for cluster in cluster_chain:
+        directory_bytes += read_sector(cluster)
+
+    for i in range(len(directory_bytes) // 32):
+        directory_entries.append(DirectoryEntry(directory_bytes[i * 32: (i + 1) * 32]))
+
+    return directory_entries
+
+def write_directory(FAT: list[int], cluster: int, entries: list[DirectoryEntry]) -> None:
+    """Writes a list of DirectoryEntrys into the specified directory cluster(s).
+    May require allocating new clusters if the list grows."""
+
+def find_entry(FAT: list[int], name: str, cluster: int) -> DirectoryEntry | None:
+    """Searches for an entry in the directory (useful for path resolution)"""
+
+def create_entry(FAT: list[int], name: str, is_dir: bool, parent_cluster: int) -> DirectoryEntry:
+    """Adds a file or subdirectory entry to a directory
+    Sets . and .. entries if it's a subdirectory
+    Allocates a cluster and returns the new entry"""
+
+def delete_entry(name: str, cluster: int):
+    """Marks a directory entry as deleted (e.g., by zeroing the first byte)
+    Handles cleanup if needed (e.g., freeing clusters)"""
+
+def list_directory(FAT: list[int], cluster: int) -> list[str]:
+    """Lists filenames in a directory. Could filter out deleted entries, special system files, etc."""
 
 ##################################################
 ### HELPER FUNCTIONS
