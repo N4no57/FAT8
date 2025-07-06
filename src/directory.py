@@ -97,9 +97,10 @@ def find_entry(FAT: list[int], name: str, cluster: int) -> DirectoryEntry | None
         if entry.filename.strip() == name:
             return entry
 
-def create_entry(FAT: list[int], name: str, is_dir: bool, parent_cluster: int) -> DirectoryEntry:
-    """Adds a file or subdirectory entry to a directory
-    Sets . and .. entries if it's a subdirectory
+def create_entry(FAT: list[int], name: str,
+                 extension: str = "", is_dir: bool = False,
+                 parent_cluster: int = 2, size: int = 0) -> DirectoryEntry:
+    """Adds a file or subdirectory entry to a directory.
     Allocates a cluster and returns the new entry"""
 
 def delete_entry(name: str, cluster: int):
