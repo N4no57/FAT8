@@ -159,6 +159,9 @@ def delete_entry(FAT: list[int], name: str, cluster: int):
 
 def list_directory(FAT: list[int], cluster: int) -> list[str]:
     """Lists filenames in a directory. Could filter out deleted entries, special system files, etc."""
+    directory_entries = read_directory(FAT, cluster)
+    for entry in directory_entries:
+        print(entry.filename)
 
 ##################################################
 ### HELPER FUNCTIONS
