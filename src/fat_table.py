@@ -31,12 +31,11 @@ def free_cluster_chain(FAT: list, start_cluster: int) -> None:
 def get_cluster_chain(FAT: list, start_cluster: int) -> list[int]:
     """Return all clusters in the chain starting at `start_cluster`."""
     cluster_chain = []
-    fat_index = start_cluster
-    while FAT[fat_index] != 0xFF:
-        cluster_chain.append(fat_index)
-        fat_index+=1
-
-    cluster_chain.append(fat_index)
+    current = start_cluster
+    while current != 0xFF and current < len(FAT):
+        cluster_chain.append(current)
+        current = FAT[current]
+    cluster_chain.append(current)  # include final 0xFF
     return cluster_chain
 
 def is_free(FAT: list, cluster: int) -> bool:
