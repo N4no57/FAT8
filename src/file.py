@@ -3,7 +3,7 @@ from src.disk import write_sector
 from src.fat_table import get_cluster_chain
 from src.fs import DirectoryEntry
 
-def read_file(FAT: list[int], file) -> bytes:
+def read_file(FAT: list[int], file, dir_cluster) -> str:
     """Read a file's contents by following its cluster chain."""
     file_entry = find_entry(FAT, file, dir_cluster)
     if file_entry is None:
