@@ -11,6 +11,8 @@ def read_file(FAT: list[int], file, dir_cluster) -> str:
     cluster_chain = get_cluster_chain(FAT, file_entry.first_cluster)
     return "".join(read_sector(cluster).decode('ascii').rstrip('\x00') for cluster in cluster_chain)
 
+def write_file(FAT: list[int], name, dir_cluster) -> str:
+    """write a file's contents by following its cluster chain."""
 
 def write_file(FAT: list[int], dir_cluster: int, name: str, extension: str, data: bytes) -> bool:
     """Write a new file into a given directory cluster."""
