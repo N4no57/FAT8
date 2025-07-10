@@ -1,6 +1,6 @@
 from src.directory import create_entry
 from src.disk import write_sector
-from src.fat_table import allocate_cluster_chain
+from src.fat_table import get_cluster_chain
 from src.fs import DirectoryEntry
 
 def read_file(FAT: list[int],entry: DirectoryEntry) -> bytes:
@@ -11,7 +11,7 @@ def write_file(FAT: list[int], dir_cluster: int, name: str, extension: str, data
     size = (len(data)//512)+1
     file_entry = create_entry(FAT, name, extension,
                               parent_cluster=dir_cluster, size=size)
-    cluster_chain = allocate_cluster_chain(FAT, size)
+    cluster_chain = get_cluster_chain(FAT, file_entry.first_cluster)
 
     chain_num = 0
     for i in range(0, len(data), 512):
