@@ -12,8 +12,9 @@ def write_file(FAT: list[int], dir_cluster: int, name: str, extension: str, data
     size = (len(data)//512)+1
     file_entry = find_entry(FAT, name, dir_cluster)
     if file_entry is not None:
-        print("file already exists")
-        return False
+        if file_entry.attributes & 0x10 != 0x10:
+            print("file already exists")
+            return False
 
     file_entry = create_entry(FAT, name, extension,
                               parent_cluster=dir_cluster, size=size)
