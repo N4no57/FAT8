@@ -108,6 +108,12 @@ def list_directory(FAT: list[int], cluster: int) -> list[str]:
         print(entry.filename)
 
 def create_directory(FAT: list[int], name: str, parent_cluster: int):
+    directoryEntry = find_entry(FAT, name, parent_cluster)
+    if directoryEntry is not None:
+        if directoryEntry.attributes & 0x10 == 0x10:
+            print("directory already exists")
+            return
+
     directoryEntry = create_entry(FAT, name, is_dir=True, parent_cluster=parent_cluster)
     SWD = directoryEntry.first_cluster # the subdirectories Current Working Directory
 
