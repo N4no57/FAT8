@@ -22,7 +22,7 @@ def write_file(FAT: list[int], name: str, extension: str, dir_cluster: int, data
     write_to_file_location(cluster_chain, data)
     return True
 
-def create_file(FAT: list[int], dir_cluster: int, name: str, extension: str, data: bytes) -> bool:
+def create_file(FAT: list[int], name: str, extension: str, dir_cluster: int, data: bytes) -> bool:
     """Write a new file into a given directory cluster."""
     size = (len(data)//512)+1
     if find_duplicate_file(FAT, dir_cluster, name, extension):
