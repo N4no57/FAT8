@@ -1,4 +1,4 @@
-from src.directory import create_entry, find_entry
+from src.directory import create_entry, find_entry, delete_entry
 from src.disk import write_sector, read_sector
 from src.fat_table import get_cluster_chain
 from src.fs import DirectoryEntry
@@ -36,8 +36,13 @@ def create_file(FAT: list[int], name: str, extension: str, dir_cluster: int, dat
     write_to_file_location(cluster_chain, data)
     return True
 
-def delete_file(FAT: list[int], entry: DirectoryEntry) -> bool:
+def delete_file(FAT: list[int], name: str, extension: str, dir_cluster) -> bool:
     """Remove file and free its clusters."""
+    file_entry = find_entry(FAT, name, dir_cluster)
+    if file_entry is None:
+        print(f"File {name}.{extension} not found")
+        return False
+    delete_entry(FAT, name, dir_cluster)
 
 def write_to_file_location(cluster_chain, data):
     chain_num = 0
